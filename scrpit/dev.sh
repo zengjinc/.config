@@ -18,6 +18,7 @@ get_real_path(){
 ROOT=$(get_real_path)
 SCRIPT_PATH=$ROOT/script
 declare -A DOC 
+declare -A ARG
 
 
 # 检测某个函数是否已经定义
@@ -193,15 +194,29 @@ fun_st(){
 }
 
 DOC[gen_data]="调用生成数据脚本"
+ARG[gen_data]="[RepoVersion]"
 fun_gen_data(){
-    cd ${ROOT}/data/fanli_dev
-    ./run.sh $@
+    if [ -e "${ROOT}/data/${1}/run.sh" ]; then
+		path="${ROOT}/data/${1}"
+	else
+		# 默认
+		path="${ROOT}/data/fanli_dev"
+    fi
+	INFO "version:${path}"
+    cd ${path} && ./run.sh $@
 }
 
 DOC[gen_proto]="调用生成协议脚本"
+ARG[gen_proto]="[RepoVersion]"
 fun_gen_proto(){
-    cd ${ROOT}/proto/fanli
-    ./run.sh $@
+	if [ -e "${ROOT}/proto/${1}/run.sh" ]; then
+		path="${ROOT}/proto/${1}"
+	else
+		# 默认
+		path="${ROOT}/proto/fanli"
+    fi
+	INFO "version:${path}"
+    cd ${path} && ./run.sh $@
 }
 
 DOC[srv_start]="启动游戏服务"
@@ -228,7 +243,8 @@ fun_srv_restart(){
     ./game_cross_area.sh restart
 }
 
-DOC[srv_hotfix]="热更游戏节点 args: Minute"
+DOC[srv_hotfix]="热更游戏节点"
+ARG[srv_hotfix]="Minute"
 fun_srv_hotfix(){
     if [ $1 ]; then
 		cd $SCRIPT_PATH
@@ -238,7 +254,8 @@ fun_srv_hotfix(){
     fi
 }
 
-DOC[create_branch]="创建git-svn分支 args:Remote Branch eg:fanti fanli_fanti"
+DOC[create_branch]="创建新的分支"
+ARG[create_branch]="Remote Branch eg:fanti fanli_fanti"
 fun_create_branch(){
    remote=$1
    branch=$2
@@ -265,9 +282,9 @@ DOC[jump]="远程服务器"
 fun_jump(){
    no=$1
    if [ ! $no ]; then
-       INFO "1. 战2跳板机"
-       INFO "2. 阿里云"
-       INFO "3. 搬瓦工"
+       INFO "1. 战2跳板机 134.175.229.26"
+       INFO "2. 阿里云 120.24.193.173"
+       INFO "3. 搬瓦工 97.64.29.225"
        read -p "请选择目标：" no
    fi
    case $no in
@@ -304,7 +321,7 @@ fun_srv_hotfix_all(){
     fun_srv_hotfix $min
 }
 
-DOC[srv_make_mod]="编译指定模块代码,使用fzf进行选择模块"
+DOC[srv_make_mod]="编译指定模块代码"
 fun_srv_make_mod(){
 	path="$( find $ROOT/server_git/src -maxdepth 3 -type d | fzf --height 40% )"
 	if [ ! $path ]; then
@@ -319,7 +336,8 @@ fun_srv_make_mod(){
     INFO "编译源码完成"   
 }
 
-DOC[fd]="使用fzf查找配置表 args:RepoVersion"
+DOC[fd]="查找配置表"
+ARG[fd]="[RepoVersion]"
 fun_fd(){
 	path="/home/jingle/data/jhgame/data/${1}/excel"
     if [ -d $path ]; then
@@ -351,9 +369,14 @@ _CALL_FUNCTION(){
                 mink=$k
             fi
         done
+		content=${DOC[$mink]}
+
         >&2 echo -e -n "\e[95m${mink}\e[0;0m"
         eval "printf ' %.0s' {1..$((20 - ${#mink}))}"
-        >&2 echo -e "${DOC[$mink]}"
+        >&2 echo -ne "${content}"
+        eval "printf ' %.0s' {1..$(((15 - ${#content}) * 2))}"
+        >&2 echo -e "${ARG[$mink]}"
+
         unset DOC[$mink]
     done
 }
