@@ -203,7 +203,7 @@ fun_gen_data(){
 		path="${ROOT}/data/fanli_dev"
     fi
 	INFO "version:${path}"
-    cd ${path} && ./run.sh $@
+    cd ${path} && ./run.sh $@ && rm -rf tabletool/Logs/LogExcelHead
 }
 
 DOC[gen_proto]="调用生成协议脚本"
@@ -221,10 +221,15 @@ fun_gen_proto(){
 
 DOC[srv_start]="启动游戏服务"
 fun_srv_start(){
+	win_no=$( tmux display-message -p '#I' )
 	cd $SCRIPT_PATH
-    ./game_cross_all.sh start
-    ./game_cross_area.sh start
     ./game.sh start
+	sleep 2
+    ./game_cross_area.sh start
+	sleep 2
+    ./game_cross_all.sh start
+	sleep 2
+	tmux selectw -t $win_no
 }
 
 DOC[srv_stop]="停止游戏服务"
@@ -235,7 +240,7 @@ fun_srv_stop(){
     ./game.sh stop
 }
 
-DOC[srv_restart]="重启游戏服务"
+#DOC[srv_restart]="重启游戏服务"
 fun_srv_restart(){
 	cd $SCRIPT_PATH
     ./game.sh restart
@@ -248,6 +253,7 @@ ARG[srv_hotfix]="Minute"
 fun_srv_hotfix(){
     if [ $1 ]; then
 		cd $SCRIPT_PATH
+    	INFO "正在热更服务器"
         ./game.sh hotfix $1
         ./game_cross_all.sh hotfix $1
         ./game_cross_area.sh hotfix $1
@@ -304,7 +310,6 @@ fun_srv_hotfix_mod(){
     min=$(expr $time / 60 + 1)
     # 热更
     echo ""
-    INFO "正在热更服务器"
     fun_srv_hotfix $min
 }
 
@@ -317,16 +322,12 @@ fun_srv_hotfix_all(){
     min=$(expr $time / 60 + 1)
     # 热更
     echo ""
-    INFO "正在热更服务器"
     fun_srv_hotfix $min
 }
 
 DOC[srv_make_mod]="编译指定模块代码"
 fun_srv_make_mod(){
 	path="$( find $ROOT/server_git/src -maxdepth 3 -type d | fzf --height 40% )"
-	if [ ! $path ]; then
-		exit 0
-	fi
     cd ${path} || exit 1
     INFO "正在编译服务器模块..."
     INFO "path:${path}"

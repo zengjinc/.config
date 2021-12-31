@@ -20,7 +20,22 @@
 切  换          ctrl + x n or p
 命  名          ctrl + x ,
 关  闭          ctrl + x &
+窗口移动         ctrl+x :join-pane -t $window_name 	# 将当前窗口附加到指定窗口中
+
 ```
+
+```html
+ 窗口标识符
+ Symbol    Meaning
+  *        Denotes the current window.
+  -        Marks the last window (previously selected).
+  #        Window activity is monitored and activity has been detected.
+  !        Window bells are monitored and a bell has occurred in the window.
+  ~        The window has been silent for the monitor-silence interval. 
+  M        The window contains the marked pane.
+  Z        The window's active pane is zoomed.
+```
+
 
 
 ### panel
@@ -32,6 +47,9 @@
 放大/还原      ctrl + x z
 显示时间       ctrl + x t
 调整大小       ctrl + x alt+方向键
+分离窗口       ctrl + x :break-pane -n $pane_name   # 对应 join-pane
+切换方向       ctrl + x space                       # 多个panel横竖排列切换
+切换顺序       ctrl + x ctrl+o                      # 多个panel显示顺序切换
 ```
 
 ### 其他

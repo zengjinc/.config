@@ -3,6 +3,6 @@
 %% 8位
 erlang:list_to_bianry().
 %% 16位
-erlang:list_to_binary(unicode:character_to_list(X)).
+erlang:list_to_binary(unicode:characters_to_list(X)).
 ```
 

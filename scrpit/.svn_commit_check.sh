@@ -43,9 +43,10 @@ if [ "$1" = "commit" ] || [ "$1" = "ci" ] && [ "$2" = "-m" ]; then
 
   if [ -e "$tmpfile" ]; then
     files=$(cat $tmpfile)
+    files_tr=$(cat $tmpfile | sed 's/ /\n/g') # 空格替换为换行
 
-    echo here are the commit files
-    echo $files
+    echo -e "\e[92m=> here are the commit files \e[0;0m "
+    echo -e "$files_tr"
 
     rm -f $tmpfile
     rm -f $tmpmodified
@@ -53,12 +54,12 @@ if [ "$1" = "commit" ] || [ "$1" = "ci" ] && [ "$2" = "-m" ]; then
 
     read -p "confirm?[y/n]:" confirm
     if [ "$confirm" = 'y' ]; then
-      echo "checking in ..."
+      echo -e "\e[92m=> checking in ... \e[0;0m "
       svn "$@" $files
     fi
 
   else
-    echo "Nothing to do, there are no modifications"
+    echo -e "\e[92m=> Nothing to do, there are no modifications \e[0;0m "
     rm -f $tmpmodified
     rm -f $tmpmodified_t
   fi
