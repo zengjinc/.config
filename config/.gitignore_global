@@ -20,4 +20,8 @@ _checkouts/
 *.iml
 .idea
 logs
-tools.sh
+game.sh
+erlang_ls.config
+erlang_ls.config.bak
+elvis.config
+elvis.config.bak

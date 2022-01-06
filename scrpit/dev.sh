@@ -223,11 +223,11 @@ DOC[srv_start]="启动游戏服务"
 fun_srv_start(){
 	win_no=$( tmux display-message -p '#I' )
 	cd $SCRIPT_PATH
-    ./game.sh start
+    ./game_cross_all.sh start
 	sleep 2
     ./game_cross_area.sh start
 	sleep 2
-    ./game_cross_all.sh start
+    ./game.sh start
 	sleep 2
 	tmux selectw -t $win_no
 }
