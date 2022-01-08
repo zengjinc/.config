@@ -1,4 +1,4 @@
-alias cds='cd /home/jingle/data/jhgame/server_git/'
+alias cds='cd ~/data/jhgame/server_git/'
 alias proxy=proxychains
 alias ra=ranger
 
@@ -7,12 +7,16 @@ alias tn='tmux new -s'
 alias ta='tmux attach -t'
 alias tk='tmux kill-session -t'
 
-if [ -f /home/jingle/.svn_commit_check.sh ]; then
-    alias svn="/home/jingle/.svn_commit_check.sh $@"
+if [ -f ~/.vcs_auto.sh ]; then
+    alias vc="~/.vcs_auto.sh $@"
 fi
 
-if [ -f /home/jingle/.git_commit_check.sh ]; then
-    alias git="/home/jingle/.git_commit_check.sh $@"
+if [ -f ~/.svn_commit_check.sh ]; then
+    alias svn="~/.svn_commit_check.sh $@"
+fi
+
+if [ -f ~/.git_commit_check.sh ]; then
+    alias git="~/.git_commit_check.sh $@"
 fi
 
 alias fd='

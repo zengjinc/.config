@@ -20,6 +20,7 @@ cp ~/.git_commit_check.sh scrpit/
 cp ~/.git-prompt.sh scrpit/
 cp ~/.resolution_auto.sh scrpit/
 cp ~/.svn_commit_check.sh scrpit/
+cp ~/.vcs_auto.sh scrpit/
 
 git add .
 git commit -m sync
