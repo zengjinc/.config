@@ -1,6 +1,5 @@
-cp -r ~/.config/alacritty/* alacritty/
-
-cp ~/.bash_aliases config/
+cp -r ~/.config/alacritty/* alacritty/ \
+&& cp ~/.bash_aliases config/
 cp ~/.bash_profile config/
 cp ~/.bashrc config/
 cp ~/.fzf.bash config/
