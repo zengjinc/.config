@@ -41,3 +41,10 @@ find ~/data/jhgame/data/fanli_dev/excel/ -name "*.xlsx" | fzf --bind "enter:exec
 > 参考链接: 
 > https://note.qidong.name/2020/09/customize-powerline/
 
+### 统计目录空间
+```bash
+sudo du -sh /home/jingle
+```
+
+
+

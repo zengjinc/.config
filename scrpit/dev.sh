@@ -240,12 +240,12 @@ fun_srv_stop(){
     ./game.sh stop
 }
 
-#DOC[srv_restart]="重启游戏服务"
+#DOC[srv_restart]="编译后重启游戏服务"
 fun_srv_restart(){
-	cd $SCRIPT_PATH
-    ./game.sh restart
-    ./game_cross_all.sh restart
-    ./game_cross_area.sh restart
+	fun_srv_stop
+	sleep 2
+    INFO "正在重新编译..."
+    cd ${ROOT}/server_git && make && fun_srv_start
 }
 
 DOC[srv_hotfix]="热更游戏节点"
@@ -347,6 +347,25 @@ fun_fd(){
 	else
     	echo 找不到路径:$path
     fi
+}
+
+DOC[erl_ls]="连接到erlang_ls"
+fun_erl_ls(){
+    name=$(epmd -names | grep erlang_ls | awk '{print $2}')
+    if [ $name ]; then
+        erl -sname debug -remsh $(name)@jingle-PC	
+    else
+        ERR "未找到erlang_ls服务" 
+    fi
+}
+
+DOC[erl_ls_mod]="erlang_ls插件魔改同步"
+fun_erl_ls_mod(){
+    cp ~/data/erlang_ls/_build/dap/bin/* ~/.vscode/extensions/erlang-ls.erlang-ls-0.0.32/erlang_ls/_build/dap/bin
+    cp ~/data/erlang_ls/_build/default/bin/* ~/.vscode/extensions/erlang-ls.erlang-ls-0.0.32/erlang_ls/_build/default/bin
+
+    cp ~/data/erlang_ls/_build/dap/bin/* ~/.vscode-server/extensions/erlang-ls.erlang-ls-0.0.32/erlang_ls/_build/dap/bin
+    cp ~/data/erlang_ls/_build/default/bin/* ~/.vscode-server/extensions/erlang-ls.erlang-ls-0.0.32/erlang_ls/_build/default/bin 
 }
 
 

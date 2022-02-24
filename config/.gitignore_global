@@ -21,7 +21,10 @@ _checkouts/
 .idea
 logs
 game.sh
+game_1.sh
 erlang_ls.config
 erlang_ls.config.bak
 elvis.config
 elvis.config.bak
+.editorconfig
+.vscode
