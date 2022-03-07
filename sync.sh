@@ -21,6 +21,7 @@ cp -r ~/.config/alacritty/* alacritty/ \
 && cp ~/.resolution_auto.sh scrpit/ \
 && cp ~/.svn_commit_check.sh scrpit/ \
 && cp ~/.vcs_auto.sh scrpit/ \
+&& cp ~/bdown.sh scrpit/ \
 \
 && git add . \
 && git commit -m sync \

@@ -4,6 +4,7 @@ alias ra=ranger
 alias s='vc st'
 
 # tmux
+alias t='tmux new -s dev -n dev'
 alias tn='tmux new -s'
 alias ta='tmux attach -t'
 alias tk='tmux kill-session -t'
