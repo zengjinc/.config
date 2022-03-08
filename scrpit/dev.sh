@@ -332,8 +332,16 @@ fun_srv_make_mod(){
     INFO "正在编译服务器模块..."
     INFO "path:${path}"
     ebin=${ROOT}/server_git/ebin
-    params="[{i,\"${ROOT}/server_git/include\"},{outdir,\"${ROOT}/server_git/ebin\"}]"
-    erl -pa ${ebin} -noshell -eval "make:all(${params})" -s c q
+
+    #params="[{i,\"${ROOT}/server_git/include\"},{outdir,\"${ROOT}/server_git/ebin\"}]"
+    #erl -pa ${ebin} -noshell -eval "make:all(${params})" -s c q
+
+    params="{['gen_server_game.erl'],[]},{i,\"${ROOT}/server_git/include\"},{outdir,\"${ROOT}/server_git/ebin\"},inline,tuple_calls,{inline_size,30},debug_info"
+    erl -pa ${ebin} -noshell -eval "mmake:all(6,[${params}])" -s c q
+
+	# todo 使用erlc并行编译
+    #erlc -smp -v -I ${ROOT}/server_git/include -o ${ROOT}/server_git/ebin -pa ${ebin} *.erl
+
     INFO "编译源码完成"   
 }
 
