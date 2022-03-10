@@ -47,4 +47,8 @@ sudo du -sh /home/jingle
 ```
 
 
+### 在运行命令时设置环境变量
+```bash
+PREFIX=/path/to/directory make -e install
+```
 

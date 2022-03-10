@@ -166,7 +166,7 @@ is_exclude(){
 
 # 更新git所有分支
 pull_all_branch(){
-    git branch | awk 'BEGIN{}{if($1=="*"){current=substr($0,3)};print a"git checkout "substr($0,3);print "git svn rebase";}END{print "git checkout " current}' | sh
+    git branch | awk 'BEGIN{}{if($1=="*"){current=substr($0,3)};print a"git checkout "substr($0,3);print "git up";}END{print "git checkout " current}' | sh
 }
 
 DOC[st]="查看仓库状态"
@@ -285,6 +285,7 @@ fun_create_branch(){
 }
 
 DOC[jump]="远程服务器"
+ARG[jump]="[Which]"
 fun_jump(){
    no=$1
    if [ ! $no ]; then
@@ -309,7 +310,6 @@ fun_srv_hotfix_mod(){
     time=$(expr `date +%s` - $start_time)
     min=$(expr $time / 60 + 1)
     # 热更
-    echo ""
     fun_srv_hotfix $min
 }
 
@@ -321,7 +321,6 @@ fun_srv_hotfix_all(){
     time=$(expr `date +%s` - $start_time)
     min=$(expr $time / 60 + 1)
     # 热更
-    echo ""
     fun_srv_hotfix $min
 }
 
@@ -361,7 +360,7 @@ DOC[erl_ls]="连接到erlang_ls"
 fun_erl_ls(){
     name=$(epmd -names | grep erlang_ls | awk '{print $2}')
     if [ $name ]; then
-        erl -sname debug -remsh $(name)@jingle-PC	
+        erl -sname debug -remsh $name@jingle-PC	
     else
         ERR "未找到erlang_ls服务" 
     fi

@@ -1,5 +1,4 @@
 alias cds='cd ~/data/jhgame/server_git/'
-alias proxy=proxychains
 alias ra=ranger
 alias s='vc st'
 
