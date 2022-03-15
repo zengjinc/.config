@@ -1,223 +1,224 @@
 {
-    "editor.fontSize": 15,
-    "editor.fontFamily": "FiraCode Nerd Font",
-    "editor.fontWeight": "500",
-    "editor.wordWrap": "on",
-    "editor.minimap.enabled": false,
-    "debug.console.fontFamily": "FiraCode Nerd Font",
-    "debug.console.fontSize": 14,
-    "terminal.integrated.fontFamily": "FiraCode Nerd Font",
-    "terminal.integrated.fontWeight": "bold",
-    "terminal.integrated.fontWeightBold": "400",
-    "terminal.integrated.fontSize": 14,
-    "customizeUI.font.regular": "FiraCode Nerd Font",
-    "winopacity.opacity": 240,
-    "workbench.iconTheme": "material-icon-theme",
-    "workbench.sideBar.location": "right",
-    "workbench.editor.wrapTabs": true,
-    "workbench.editor.closeOnFileDelete": true,
-    "workbench.editor.limit.enabled": true,
-    "workbench.editor.limit.value": 15,
-    "workbench.colorCustomizations": {
-        "editor.lineHighlightBackground": "#1073cf2d",
-        "editor.lineHighlightBorder": "#9fced11f"
+    "[erlang]": {
+        "editor.defaultFormatter": "szTheory.erlang-formatter",
+        "editor.formatOnSave": false
     },
     "[json]": {
         "editor.quickSuggestions": {
             "strings": true
-        }
-        ,"editor.suggest.insertMode": "replace"
+        },
+        "editor.suggest.insertMode": "replace"
     },
-    "[erlang]": {
-        "editor.formatOnSave": false,
-        "editor.defaultFormatter": "szTheory.erlang-formatter"  // 用rebar.config指定格式化样式
-        // "editor.defaultFormatter": "erlang-ls.erlang-ls"
+    "autopunc.dictionary": {
+        "。": ".",
+        "，": ",",
+        "：": ":",
+        "；": ";",
+        "！": "!",
+        "“": "\"",
+        "”": "\"",
+        "‘": "'",
+        "’": "'",
+        "（": "(",
+        "）": ")",
+        "【": "[",
+        "】": "]",
+        "》": ">",
+        "《": "<",
+        "…": "^",
+        "￥": "$",
+        "、": "/",
+        "？": "?",
+        "·": "`",
+        "—": "_"
     },
-    "editor.tokenColorCustomizations": {
-        
-    },
-    "editor.bracketPairColorization.enabled": true,
-
-    "vsicons.presets.hideFolders": false,
-
-    "sync.gist": "76ebaf4b05a266672f215967ce5e24be",
-    "vsicons.dontShowNewVersionMessage": true,
-    "html.format.templating": false,
-
     "code-runner.clearPreviousOutput": true,
-    "code-runner.saveAllFilesBeforeRun": true,
-    "code-runner.runInTerminal": false,
     "code-runner.executorMap": {
-        "javascript": "node",
-        "java": "cd $dir && javac $fileName && java $fileNameWithoutExt",
-        "c": "cd $dir && gcc $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
-        "cpp": "cd $dir && g++ $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
-        "erlang": "cd $dir && escript $fileName",
-        "objective-c": "cd $dir && gcc -framework Cocoa $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
-        "php": "php",
-        "python": "python -u",
-        "perl": "perl",
-        "perl6": "perl6",
-        "ruby": "ruby",
-        "go": "go run",
-        "lua": "lua",
-        "groovy": "groovy",
-        "powershell": "powershell -ExecutionPolicy ByPass -File",
-        "bat": "cmd /c",
-        "shellscript": "bash",
-        "fsharp": "fsi",
-        "csharp": "scriptcs",
-        "vbscript": "cscript //Nologo",
-        "typescript": "ts-node",
-        "coffeescript": "coffee",
-        "scala": "scala",
-        "swift": "swift",
-        "julia": "julia",
-        "crystal": "crystal",
-        "ocaml": "ocaml",
-        "r": "Rscript",
-        "applescript": "osascript",
-        "clojure": "lein exec",
-        "haxe": "haxe --cwd $dirWithoutTrailingSlash --run $fileNameWithoutExt",
-        "rust": "cd $dir && rustc $fileName && $dir$fileNameWithoutExt",
-        "racket": "racket",
-        "scheme": "csi -script",
-        "ahk": "autohotkey",
-        "autoit": "autoit3",
-        "dart": "dart",
-        "pascal": "cd $dir && fpc $fileName && $dir$fileNameWithoutExt",
-        "d": "cd $dir && dmd $fileName && $dir$fileNameWithoutExt",
-        "haskell": "runhaskell",
-        "nim": "nim compile --verbosity:0 --hints:off --run",
-        "lisp": "sbcl --script",
-        "kit": "kitc --run",
-        "v": "v run",
-        "sass": "sass --style expanded",
-        "scss": "scss --style expanded",
-        "less": "cd $dir && lessc $fileName $fileNameWithoutExt.css",
         "FortranFreeForm": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "ahk": "autohotkey",
+        "applescript": "osascript",
+        "autoit": "autoit3",
+        "bat": "cmd /c",
+        "c": "cd $dir && gcc $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "clojure": "lein exec",
+        "coffeescript": "coffee",
+        "cpp": "cd $dir && g++ $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "crystal": "crystal",
+        "csharp": "scriptcs",
+        "d": "cd $dir && dmd $fileName && $dir$fileNameWithoutExt",
+        "dart": "dart",
+        "erlang": "cd $dir && escript $fileName",
+        "fortran": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
         "fortran-modern": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
         "fortran_fixed-form": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
-        "fortran": "cd $dir && gfortran $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt"
+        "fsharp": "fsi",
+        "go": "go run",
+        "groovy": "groovy",
+        "haskell": "runhaskell",
+        "haxe": "haxe --cwd $dirWithoutTrailingSlash --run $fileNameWithoutExt",
+        "java": "cd $dir && javac $fileName && java $fileNameWithoutExt",
+        "javascript": "node",
+        "julia": "julia",
+        "kit": "kitc --run",
+        "less": "cd $dir && lessc $fileName $fileNameWithoutExt.css",
+        "lisp": "sbcl --script",
+        "lua": "lua",
+        "nim": "nim compile --verbosity:0 --hints:off --run",
+        "objective-c": "cd $dir && gcc -framework Cocoa $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
+        "ocaml": "ocaml",
+        "pascal": "cd $dir && fpc $fileName && $dir$fileNameWithoutExt",
+        "perl": "perl",
+        "perl6": "perl6",
+        "php": "php",
+        "powershell": "powershell -ExecutionPolicy ByPass -File",
+        "python": "python -u",
+        "r": "Rscript",
+        "racket": "racket",
+        "ruby": "ruby",
+        "rust": "cd $dir && rustc $fileName && $dir$fileNameWithoutExt",
+        "sass": "sass --style expanded",
+        "scala": "scala",
+        "scheme": "csi -script",
+        "scss": "scss --style expanded",
+        "shellscript": "bash",
+        "swift": "swift",
+        "typescript": "ts-node",
+        "v": "v run",
+        "vbscript": "cscript //Nologo"
+    },
+    "code-runner.runInTerminal": false,
+    "code-runner.saveAllFilesBeforeRun": true,
+    "customizeUI.font.monospace": "FiraCode Nerd Font",
+    "customizeUI.font.regular": "FiraCode Nerd Font",
+    "database-client.disableSqlCodeLen": true,
+    "database-client.showQuery": true,
+    "database-client.showTrigger": true,
+    "database-client.showUser": true,
+    "debug.console.fontFamily": "FiraCode Nerd Font",
+    "debug.console.fontSize": 14,
+    "diffEditor.wordWrap": "off",
+    "editor.bracketPairColorization.enabled": true,
+    "editor.codeLens": false,
+    "editor.cursorBlinking": "smooth",
+    "editor.cursorStyle": "block",
+    "editor.cursorSurroundingLines": 25,
+    "editor.fontFamily": "FiraCode Nerd Font",
+    "editor.fontSize": 15,
+    "editor.fontWeight": "500",
+    "editor.formatOnPaste": true,
+    "editor.guides.bracketPairs": false,
+    "editor.guides.indentation": false,
+    "editor.inlayHints.enabled": false,
+    "editor.largeFileOptimizations": false,
+    "editor.minimap.enabled": false,
+    "editor.tokenColorCustomizations": {},
+    "editor.unusualLineTerminators": "auto",
+    "editor.wordWrap": "on",
+    "erlang_ls.dapPath": "/home/jingle/data/erlang_ls/_build/dap/bin/els_dap",
+    "erlang_ls.serverPath": "/home/jingle/data/erlang_ls/_build/default/bin/erlang_ls",
+    "explorer.confirmDelete": false,
+    "fileheader.configObj": {
+        "afterAnnotation": {
+            "*": "\n",
+            "erl": "\n-module(file_name).\n\n-include(\"common.hrl\").\n\n% erlfmt-ignore\n-export([\n\n])."
+        },
+        "annotationStr": {
+            "end": " */",
+            "head": "/*",
+            "middle": " * @",
+            "use": false
+        },
+        "autoAdd": true,
+        "autoAddLine": 10,
+        "autoAlready": true,
+        "beforeAnnotation": {},
+        "createHeader": true,
+        "dateFormat": "YYYY-MM-DD",
+        "language": {
+            "erl/hrl": {
+                "end": "%%%-------------------------------------------------------------------",
+                "head": "%%%-------------------------------------------------------------------",
+                "middle": "%%% "
+            }
+        },
+        "moveCursor": true,
+        "specialOptions": {
+            "Date": "Created"
+        },
+        "supportAutoLanguage": [],
+        "switch": {
+            "newlineAddAnnotation": true
+        },
+        "wideNum": 8,
+        "wideSame": true
+    },
+    "fileheader.cursorMode": {},
+    "fileheader.customMade": {
+        "Author": "zengjinc",
+        "Date": "Do not edit",
+        "custom_string_obkoro1": "@doc\n\n@end"
     },
     "files.autoGuessEncoding": true,
-    "svn.multipleFolders.ignore": [
-        "**/.git",
-        "**/.svn",
-        "**/.hg",
-        "**/vendor",
-        "**/node_modules",
-        "**/docs"
-    ],
     "files.autoSave": "afterDelay",
     "files.exclude": {
         "**/.idea": true,
         "**/ebin": true,
         "**/logs": true
     },
-    "editor.formatOnPaste": true,
-    "problems.decorations.enabled": false,
-    "security.workspace.trust.untrustedFiles": "open",
-    "window.titleBarStyle": "custom",
-    "editor.codeLens": false,
-    "editor.largeFileOptimizations": false,
-    "[javascript]": {
-        "editor.defaultFormatter": "HookyQR.beautify"
-    },
     "files.saveConflictResolution": "overwriteFileOnDisk",
-
-    // 头部注释
-    "fileheader.customMade": {
-        // 头部注释默认字段
-        "Author": "zengjinc",
-        "Date": "Do not edit", // 设置后默认设置文件生成时间
-        "custom_string_obkoro1": "@doc\n\n@end",
-    },
-    // 函数注释
-    "fileheader.cursorMode": {
-    },
-    // 插件配置项
-    "fileheader.configObj": {
-        "specialOptions": {
-            "Date": "Created",
-        },
-        "autoAdd": true, // 检测文件没有头部注释，自动添加文件头部注释
-        "autoAddLine": 10, // 文件超过多少行数 不再自动添加头部注释
-        "wideSame": true, // 设置为true开启
-        "wideNum": 8, // 字段长度 默认为13
-        "moveCursor": true, // 自动移动光标到Description所在行
-        "dateFormat": "YYYY-MM-DD",
-        "createHeader": true, // 新建文件自动添加头部注释
-        "autoAlready": true, // 只添加插件支持的语言以及用户通过`language`选项自定义的注释
-        "supportAutoLanguage": [], // 设置之后，在数组内的文件才支持自动添加
-        "beforeAnnotation": {}, // 头部注释之前插入内容
-        "afterAnnotation": {
-            "erl": "\n-module(file_name).\n\n-include(\"common.hrl\").\n\n-export([\n\n]).",
-            "*": "\n" // 所有文件新增头部注释之后都空一行
-        }, // 需要特殊定制的文件后缀
-        "switch": {
-            "newlineAddAnnotation": true // 默认遇到换行符(\r\n \n \r)添加注释符号
-        },
-        
-        // 自定义语言注释符号，覆盖插件的注释格式
-        "language": {
-            // 一次匹配多种文件后缀文件 不用重复设置
-            "erl/hrl": {
-                "head": "%%%-------------------------------------------------------------------", // 统一增加几个*号
-                "middle": "%%% ",
-                "end": "%%%-------------------------------------------------------------------"
-            },
-        },
-        // 默认注释  没有匹配到注释符号的时候使用
-        "annotationStr": {
-            "head": "/*",
-            "middle": " * @",
-            "end": " */",
-            "use": false
-        },
-    },
-    "explorer.confirmDelete": false,
+    "gitlens.codeLens.enabled": false,
+    "html.format.templating": false,
+    "local-history.path": "/home/jingle/data/local_history",
     "outline.problems.colors": false,
-    "editor.unusualLineTerminators": "auto",
+    "php.executablePath": "/usr/bin/php7.4",
+    "php.memoryLimit": "2048M",
+    "php.suggest.basic": false,
+    "problems.decorations.enabled": false,
     "remote.SSH.remotePlatform": {
-        "PC-Linux": "linux",
-        "Linux-PC": "linux"
+        "Linux-PC": "linux",
+        "PC-Linux": "linux"
     },
     "resmon.disk.format": "PercentRemaining",
     "resmon.show.battery": false,
     "resmon.show.cputemp": true,
+    "security.workspace.trust.untrustedFiles": "open",
+    "svn.multipleFolders.ignore": [
+        "**/.git",
+        "**/.hg",
+        "**/.svn",
+        "**/docs",
+        "**/node_modules",
+        "**/vendor"
+    ],
+    "sync.gist": "76ebaf4b05a266672f215967ce5e24be",
+    "terminal.integrated.copyOnSelection": true,
+    "terminal.integrated.fontFamily": "FiraCode Nerd Font",
+    "terminal.integrated.fontSize": 14,
+    "terminal.integrated.fontWeight": "bold",
+    "terminal.integrated.fontWeightBold": "400",
     "todo-tree.general.enableFileWatcher": true,
     "todo-tree.general.revealBehaviour": "start of line",
     "todo-tree.general.statusBar": "current file",
     "todo-tree.general.tags": [
         "% TODO",
+        "% todo",
         "%% TODO",
-        "%% todo",
-        "% todo"
+        "%% todo"
     ],
-    "editor.cursorBlinking": "smooth",
-    "editor.cursorSurroundingLines": 25,
-    "editor.cursorStyle": "block",
-    "local-history.path": "/home/jingle/data/local_history",
-    
-    "diffEditor.wordWrap": "off",
-    "editor.guides.indentation": false,
-    "editor.guides.bracketPairs": false,
-    "editor.inlayHints.enabled": false,
-    "database-client.disableSqlCodeLen": true,
-    "database-client.showQuery": true,
-    "database-client.showTrigger": true,
-    "database-client.showUser": true,
-    "gitlens.codeLens.enabled": false,
-    "php.executablePath": "/usr/bin/php7.4",
-    "php.suggest.basic": false,
-    "php.memoryLimit": "2048M",
-    "customizeUI.font.monospace": "FiraCode Nerd Font",
-    "terminal.integrated.copyOnSelection": true,
-    "erlang_ls.dapPath": "/home/jingle/data/erlang_ls/_build/dap/bin/els_dap",
-    "erlang_ls.serverPath": "/home/jingle/data/erlang_ls/_build/default/bin/erlang_ls",
-    
-    
-    
-    
+    "vsicons.dontShowNewVersionMessage": true,
+    "vsicons.presets.hideFolders": false,
+    "window.titleBarStyle": "custom",
+    "winopacity.opacity": 230,
+    "workbench.colorCustomizations": {
+        "editor.lineHighlightBackground": "#1073cf2d",
+        "editor.lineHighlightBorder": "#9fced11f"
+    },
+    "workbench.editor.closeOnFileDelete": true,
+    "workbench.editor.limit.enabled": true,
+    "workbench.editor.limit.value": 10,
+    "workbench.editor.wrapTabs": true,
+    "workbench.iconTheme": "material-icon-theme",
+    "workbench.sideBar.location": "right",
+    "database-client.highlightSQLBlock": true,
+    "editor.unicodeHighlight.includeStrings": false
 }
