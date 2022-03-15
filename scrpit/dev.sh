@@ -366,15 +366,10 @@ fun_erl_ls(){
     fi
 }
 
-DOC[erl_ls_mod]="erlang_ls插件魔改同步"
-fun_erl_ls_mod(){
-    cp ~/data/erlang_ls/_build/dap/bin/* ~/.vscode/extensions/erlang-ls.erlang-ls-0.0.32/erlang_ls/_build/dap/bin
-    cp ~/data/erlang_ls/_build/default/bin/* ~/.vscode/extensions/erlang-ls.erlang-ls-0.0.32/erlang_ls/_build/default/bin
-
-    cp ~/data/erlang_ls/_build/dap/bin/* ~/.vscode-server/extensions/erlang-ls.erlang-ls-0.0.32/erlang_ls/_build/dap/bin
-    cp ~/data/erlang_ls/_build/default/bin/* ~/.vscode-server/extensions/erlang-ls.erlang-ls-0.0.32/erlang_ls/_build/default/bin 
+DOC[clean_share]="清空share共享目录"
+fun_clean_share(){
+	cd ~/share/ && find ./* |  grep -v "note" | xargs rm -rf
 }
-
 
 # -------------- 函数调用 --------------
 # 调用函数
