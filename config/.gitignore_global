@@ -4,6 +4,9 @@
 *.plt
 erl_crash.dump
 .concrete/DEV_MODE
+*.diff
+*.orig
+st
 
 # rebar 2.x
 .rebar

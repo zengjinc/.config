@@ -232,6 +232,15 @@ fun_srv_start(){
 	tmux selectw -t $win_no
 }
 
+DOC[srv_start2]="启动游戏服务"
+fun_srv_start2(){
+	cd $SCRIPT_PATH
+	tmux new-session -d -s dev "./game.sh test"
+	tmux split-window -d -t dev:1 "./game_cross_area.sh test"
+	tmux split-window -d -t dev:1 "./game_cross_all.sh test"
+	tmux select-layout -t dev:1 tiled
+}
+
 DOC[srv_stop]="停止游戏服务"
 fun_srv_stop(){
 	cd $SCRIPT_PATH
