@@ -21,7 +21,7 @@ if [ -f ~/.git_commit_check.sh ]; then
 fi
 
 alias fd='
-	find ~/data/jhgame/data/fanli_dev/excel/ -name "*.xlsx" \
+	find ~/data/jhgame/data/mailiang_dev/excel/ -name "*.xlsx" \
 	| fzf --bind "enter:execute-silent(et {} &)+abort,left-click:execute-silent(et {} &)+abort"
 '
 # 远程连接win桌面

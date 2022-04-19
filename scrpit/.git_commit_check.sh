@@ -9,10 +9,10 @@ if [ "$1" = "up" ] || [ "$1" = "sync" ] || [ "$1" = "push" ]; then
     else
         git $@
     fi 
-#elif [ "$1" = "add" ] && [ "$2" == "." ]; then
+elif [ "$1" = "add" ] && [ "$2" == "." ]; then
    # 不提交script目录下的文件
-#   git $@
-#   git rh script
+   git $@
+   git rh src/lib/proto_rpc/client_mock.erl
 else
     git $@
 fi

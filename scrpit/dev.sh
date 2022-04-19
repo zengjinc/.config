@@ -200,7 +200,7 @@ fun_gen_data(){
 		path="${ROOT}/data/${1}"
 	else
 		# 默认
-		path="${ROOT}/data/fanli_dev"
+		path="${ROOT}/data/mailiang_dev"
     fi
 	INFO "version:${path}"
     cd ${path} && ./run.sh $@ && rm -rf tabletool/Logs/LogExcelHead
@@ -213,7 +213,7 @@ fun_gen_proto(){
 		path="${ROOT}/proto/${1}"
 	else
 		# 默认
-		path="${ROOT}/proto/fanli"
+		path="${ROOT}/proto/mailiang"
     fi
 	INFO "version:${path}"
     cd ${path} && ./run.sh $@
