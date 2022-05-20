@@ -123,3 +123,5 @@ else
     eval $(dircolors)
 fi
 
+# 禁用 ctrl+s 锁定屏幕
+stty -ixon

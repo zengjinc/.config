@@ -13,6 +13,8 @@ elif [ "$1" = "add" ] && [ "$2" == "." ]; then
    # 不提交script目录下的文件
    git $@
    git rh src/lib/proto_rpc/client_mock.erl
+elif [ "$1" = "slg" ]; then
+   git lg --author="chenzengjin\|fengzhenlin\|huangxiaoming"	
 else
     git $@
 fi

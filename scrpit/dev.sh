@@ -19,6 +19,7 @@ ROOT=$(get_real_path)
 SCRIPT_PATH=$ROOT/script
 declare -A DOC 
 declare -A ARG
+TMUX_WIN_NO=1
 
 
 # 检测某个函数是否已经定义
@@ -88,11 +89,28 @@ fun_completion(){
     echo $(declare -p DOC)
 }
 
+# 
+update_tmux_win_no(){
+	TMUX_WIN_NO=$[$(tmux list-window -t dev 2>&1 | wc -l) + 1]
+}
+
 DOC[test]="测试方法"
 fun_test(){
     echo $ROOT
-	test="$( find $ROOT/server_git -maxdepth 3 -type d | fzf )"
-	echo $test
+	#test="$( find $ROOT/server_git -maxdepth 3 -type d | fzf )"
+	#test=(( $(tmux list-window -t dev 2>&1 | wc -l)+1 ))
+	#test=$[$(tmux list-window -t dev 2>&1 | wc -l) + 1]
+	#test=$(date +%H)
+	#if [ $test == 14 ]; then
+	#	echo "equal"
+	#fi
+	#echo $test
+	#change_t=$(stat -c %Z dev.sh)
+	#last_t=$(cat hot_time.txt)
+	#echo $change_t
+	#echo $last_t
+	no=
+	echo $no
 }
 
 DOC[up_all]="更新所有的源码仓库,所有分支"
@@ -221,7 +239,7 @@ fun_gen_proto(){
 
 DOC[srv_start]="启动游戏服务"
 fun_srv_start(){
-	win_no=$( tmux display-message -p '#I' )
+	cur_win_no=$( tmux display-message -p '#I' )
 	cd $SCRIPT_PATH
     ./game_cross_all.sh start
 	sleep 2
@@ -229,16 +247,21 @@ fun_srv_start(){
 	sleep 2
     ./game.sh start
 	sleep 2
-	tmux selectw -t $win_no
+	tmux selectw -t $cur_win_no
 }
 
 DOC[srv_start2]="启动游戏服务"
 fun_srv_start2(){
+	if tmux has -t dev:game 2> /dev/null; then
+		ERR "启动失败，窗口game已存在"
+		exit 1
+	fi
 	cd $SCRIPT_PATH
-	tmux new-session -d -s dev "./game.sh test"
-	tmux split-window -d -t dev:1 "./game_cross_area.sh test"
-	tmux split-window -d -t dev:1 "./game_cross_all.sh test"
-	tmux select-layout -t dev:1 tiled
+    update_tmux_win_no	
+	tmux new-window -t dev:${TMUX_WIN_NO} -n game "./game.sh test"
+	tmux split-window -t dev:game "./game_cross_area.sh test"
+	tmux split-window -t dev:game "./game_cross_all.sh test"
+	tmux select-layout -t dev:game main-vertical 
 }
 
 DOC[srv_stop]="停止游戏服务"
@@ -270,7 +293,7 @@ fun_srv_hotfix(){
 }
 
 DOC[create_branch]="创建新的分支"
-ARG[create_branch]="Remote Branch eg:fanti fanli_fanti"
+ARG[create_branch]="Remote Branch eg:fanti fanti_stable"
 fun_create_branch(){
    remote=$1
    branch=$2
@@ -293,22 +316,115 @@ fun_create_branch(){
    git checkout -b $branch svn/$branch
 }
 
-DOC[jump]="远程服务器"
-ARG[jump]="[Which]"
-fun_jump(){
+DOC[j]="远程服务器"
+ARG[j]="[Which]"
+fun_j(){
    no=$1
    if [ ! $no ]; then
-       INFO "1. 战2跳板机 134.175.229.26"
-       INFO "2. 阿里云 120.24.193.173"
-       INFO "3. 搬瓦工 97.64.29.225"
+       INFO "1. jump-server        134.175.229.26\n"
+       INFO "2. develop-machine    121. 41. 24.48\n"
+       INFO "3. script-machine      47. 97.181.102\n"
+       INFO "4. center-machine     121.199. 63.150\n"
+       INFO "5. center-ft-machine  175. 99.  6.46\n"
+       INFO "6. zll3d-release\n"
+       INFO "7. zll3d-ft-release\n"
+       INFO "11. 阿里云-个人\n"
+       INFO "12. 搬瓦工-个人\n"
        read -p "请选择目标：" no
    fi
    case $no in
-     1) zssh -X -i ~/.ssh/id_rsa -p 2222 chenzengjin@134.175.229.26 ;;
-     2) zssh -X -i ~/.ssh/id_rsa root@120.24.193.173 ;;
-     3) zssh -X -i ~/.ssh/id_rsa -p 27942 root@97.64.29.225 ;;
+     1 | jump) 
+		update_tmux_win_no
+		tmux new-window -t dev:${TMUX_WIN_NO} -n Jump-Server "zssh JumpServer"
+	    ;;
+     2) 
+		update_tmux_win_no
+		tmux new-window -t dev:${TMUX_WIN_NO} -n Zll3d-Develop "zssh DevelopMachine"
+	    ;;
+	 3) 
+		update_tmux_win_no
+		tmux new-window -t dev:${TMUX_WIN_NO} -n Zll3d-Script "zssh ScriptMachine"
+	    ;;
+	 4) 
+		update_tmux_win_no
+		tmux new-window -t dev:${TMUX_WIN_NO} -n Zll3d-Center "zssh CenterMachine"
+	    ;;
+	 5) 
+		update_tmux_win_no
+		tmux new-window -t dev:${TMUX_WIN_NO} -n Zll3d-Center-Ft "zssh CenterFtMachine"
+	    ;;
+	 6) 
+		update_tmux_win_no
+		tmux new-window -t dev:${TMUX_WIN_NO} -n Zll3d-Release "zssh ScriptMachine"
+		tmux split-window -t dev:Zll3d-Release "zssh CenterMachine"
+		tmux select-layout -t dev:Zll3d-Release even-horizontal
+	    ;;
+	 7) 
+		update_tmux_win_no
+		tmux new-window -t dev:${TMUX_WIN_NO} -n Zll3d-Ft-Release "zssh ScriptMachine"
+		tmux split-window -t dev:Zll3d-Ft-Release "zssh CenterFtMachine"
+		tmux select-layout -t dev:Zll3d-Ft-Release even-horizontal
+	    ;;
+     11) zssh -X -i ~/.ssh/id_rsa root@120.24.193.173 ;;
+     12) zssh -X -i ~/.ssh/id_rsa -p 27942 root@97.64.29.225 ;;
      *) ;;
    esac
+}
+
+jump_step_1(){
+	ip=$1
+	expect -c "
+		set timeout 15
+    	spawn -noecho zssh -X -i ~/.ssh/id_rsa -p 2222 chenzengjin@134.175.229.26; 
+    	expect \"Opt\"; 
+    	send $ip;
+		sleep 0.5;
+		send \r;
+    	interact;
+	" 
+}
+
+jump_tw(){
+	expect -c "
+		set timeout 15
+    	spawn -noecho zssh -X -i ~/.ssh/id_rsa -p 1986 root@47.57.187.224; 
+		expect \"]#\";
+		send \"ssh 175.99.6.46 -p 1986\";
+		sleep 0.5;
+		send \r;
+    	interact;
+	" 
+}
+
+jump_step_2(){
+	ip=$1
+	choice=$2
+	expect -c "
+		set timeout 15
+    	spawn -noecho zssh -X -i ~/.ssh/id_rsa -p 2222 chenzengjin@134.175.229.26; 
+    	expect \"Opt\"; 
+    	send $ip;
+		sleep 0.5;
+		send \r;
+    	expect \"选择\"; 
+		sleep 0.5;
+    	send $choice;
+		sleep 0.5;
+		send \r;
+    	interact;
+	" 
+}
+
+jump_script(){
+	ip=$1
+	expect -c "
+	set timeout 10
+    spawn zssh -X -i ~/.ssh/id_rsa -p 2222 chenzengjin@134.175.229.26
+	expect \"Opt>\" {
+		send \"$ip\r\";
+		interact
+	}
+"
 }
 
 DOC[srv_hotfix_mod]="编译热更模块代码"
@@ -378,6 +494,12 @@ fun_erl_ls(){
 DOC[clean_share]="清空share共享目录"
 fun_clean_share(){
 	cd ~/share/ && find ./* |  grep -v "note" | xargs rm -rf
+}
+
+
+DOC[hot_sql]="拉取sql并执行更新"
+fun_hot_sql(){
+	/home/jingle/data/jhgame/hot_sql.sh		
 }
 
 # -------------- 函数调用 --------------
