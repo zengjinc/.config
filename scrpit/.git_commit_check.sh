@@ -14,7 +14,7 @@ elif [ "$1" = "add" ] && [ "$2" == "." ]; then
    git $@
    git rh src/lib/proto_rpc/client_mock.erl
 elif [ "$1" = "slg" ]; then
-   git lg --author="chenzengjin\|fengzhenlin\|huangxiaoming"	
+   git lg --author="chenzengjin\|fengzhenlin\|huangxiaoming\|刘伟朝"	
 else
     git $@
 fi

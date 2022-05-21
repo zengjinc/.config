@@ -358,12 +358,18 @@ fun_j(){
 		tmux new-window -t dev:${TMUX_WIN_NO} -n Zll3d-Release "zssh ScriptMachine"
 		tmux split-window -t dev:Zll3d-Release "zssh CenterMachine"
 		tmux select-layout -t dev:Zll3d-Release even-horizontal
+		sleep 1
+		tmux send-keys -t dev:Zll3d-Release.1 "cd /data/ctl/zll3d" C-m
+		tmux send-keys -t dev:Zll3d-Release.2 "cd /data/ctl/" C-m
 	    ;;
 	 7) 
 		update_tmux_win_no
 		tmux new-window -t dev:${TMUX_WIN_NO} -n Zll3d-Ft-Release "zssh ScriptMachine"
 		tmux split-window -t dev:Zll3d-Ft-Release "zssh CenterFtMachine"
 		tmux select-layout -t dev:Zll3d-Ft-Release even-horizontal
+		sleep 1
+		tmux send-keys -t dev:Zll3d-Ft-Release.1 "cd /data/ctl/zll3dtw" C-m
+		tmux send-keys -t dev:Zll3d-Ft-Release.2 "cd /data/ctl/" C-m
 	    ;;
      11) zssh -X -i ~/.ssh/id_rsa root@120.24.193.173 ;;
      12) zssh -X -i ~/.ssh/id_rsa -p 27942 root@97.64.29.225 ;;
