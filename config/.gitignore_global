@@ -31,3 +31,4 @@ elvis.config
 elvis.config.bak
 .editorconfig
 .vscode
+*.session.sql

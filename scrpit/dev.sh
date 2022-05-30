@@ -55,13 +55,24 @@ in_array(){
 
 # 输出一条普通信息
 INFO(){
-    echo -e "\e[92m=>\e[0;0m ${1}"
+    echo -e "\e[92m=>\e[0m ${1}"
 }
 
 # 输出一条错误信息
 ERR(){
-    >&2 echo -e "\e[91m>>\e[0;0m ${1}"
+    >&2 echo -e "\e[91m>>\e[0m ${1}"
 }
+
+# 输出绿色信息
+MSG(){
+    echo -e "\e[92m${1}\e[0m"
+}
+
+# 输出红色信息
+ERR_MSG(){
+    echo -e "\e[91m${1}\e[0m"
+}
+
 
 # 检查锁
 lock_check(){
@@ -89,28 +100,9 @@ fun_completion(){
     echo $(declare -p DOC)
 }
 
-# 
+# 更新全局变量
 update_tmux_win_no(){
 	TMUX_WIN_NO=$[$(tmux list-window -t dev 2>&1 | wc -l) + 1]
-}
-
-DOC[test]="测试方法"
-fun_test(){
-    echo $ROOT
-	#test="$( find $ROOT/server_git -maxdepth 3 -type d | fzf )"
-	#test=(( $(tmux list-window -t dev 2>&1 | wc -l)+1 ))
-	#test=$[$(tmux list-window -t dev 2>&1 | wc -l) + 1]
-	#test=$(date +%H)
-	#if [ $test == 14 ]; then
-	#	echo "equal"
-	#fi
-	#echo $test
-	#change_t=$(stat -c %Z dev.sh)
-	#last_t=$(cat hot_time.txt)
-	#echo $change_t
-	#echo $last_t
-	no=
-	echo $no
 }
 
 DOC[up_all]="更新所有的源码仓库,所有分支"
@@ -127,10 +119,10 @@ fun_up_all(){
                 then
                     # INFO "工作区有改动"
                     git stash -q
-                    pull_all_branch
+                    fun_pull_all
                     git stash pop -q
                 else
-                    pull_all_branch
+                    fun_pull_all
             fi
         elif [ -d $v/.svn ]; then
             echo ---------------------------------------------
@@ -183,7 +175,8 @@ is_exclude(){
 }
 
 # 更新git所有分支
-pull_all_branch(){
+DOC[pull_all]="更新所有分支"
+fun_pull_all(){
     git branch | awk 'BEGIN{}{if($1=="*"){current=substr($0,3)};print a"git checkout "substr($0,3);print "git up";}END{print "git checkout " current}' | sh
 }
 
@@ -299,21 +292,101 @@ fun_create_branch(){
    branch=$2
 
    if [ "$remote" = "" ] || [ "$branch" = "" ]; then
-      error "参数有误, remote=$remote, branch=$branch"
+      ERR "参数有误, remote=$remote, branch=$branch"
       exit 1
    fi
 
    if [ -n "$(git status -s | grep -v ??)" ]; then
-      echo "git仓库有修改, 先stash"
+      ERR "git仓库有修改, 先stash"
       exit 1
    fi
 
-   # 增加分支信息   
-   git config --add svn-remote.svn/$branch.url http://clsvn.ijunhai.com/svn/qz3d/server/$remote
-   git config --add svn-remote.svn/$branch.fetch :refs/remotes/svn/$branch
-   # 拉取数据
-   git svn fetch -r HEAD svn/$branch
-   git checkout -b $branch svn/$branch
+	read -e -p $(echo -e "从http://clsvn.ijunhai.com/svn/qz3d/server/\e[92m$remote\e[0m拉取创建分支\e[92m$branch\e[0m?(y/n):") choice
+
+	if [ $choice == "y" ]; then
+   		# 增加分支信息   
+   		git config --add svn-remote.svn/$branch.url http://clsvn.ijunhai.com/svn/qz3d/server/$remote
+   		git config --add svn-remote.svn/$branch.fetch :refs/remotes/svn/$branch
+   		# 拉取数据
+   		git svn fetch -r HEAD svn/$branch
+   		git checkout -b $branch svn/$branch
+   fi
+}
+
+DOC[merge_branch]="分支分支代码"
+ARG[merge_branch]="Destination Sorce eg:fanti fanti_dev"
+fun_merge_branch(){
+    dest=$1
+    src=$2
+
+    if [ -z $(git branch --list $dest) ] || [ -z $(git branch --list $src) ]; then
+       ERR "分支有误, dest=$dest, src=$src"
+       exit 1
+    fi
+
+    if [ -n "$(git status -s | grep -v ??)" ]; then
+       ERR "仓库有修改, 先stash"
+       exit 1
+    fi
+
+	read -e -p $(echo -e "从\e[92m$src\e[0m分支合并src、include到\e[92m$dest\e[0m?(y/n):") choice
+
+	if [ $choice == "y" ]; then
+
+	 git checkout $src && git up \
+	 && git checkout $dest && git up \
+	 && git checkout --theirs --progress $src -- src/ \
+	 && git checkout --theirs --progress $src -- include/ \
+
+	 if [ $? -eq 0 ]; then
+     	INFO "合并完成"
+	 else
+	 	ERR "合并过程出错..."
+	 	exit 1
+	 fi
+
+	 fi
+}
+
+DOC[export_svn]="版本合并同步"
+ARG[export_svn]="Destination Sorce eg:fanti fanti_dev"
+fun_export_svn(){
+    dest_data=$ROOT/data/$1/excel/
+    src_data=$ROOT/data/$2/excel/
+
+	dest_web=$ROOT/web/$1/app/modules/
+	src_web=$ROOT/web/$2/app/modules/
+	
+	if [ ! $1 ] || [ ! $2 ]; then
+		ERR "传入参数有误"
+		exit 1
+	fi
+
+	if [ ! -d $desc_data ] || [ ! -d $src_data ] || [ ! -d $dest_web ] || [ ! -d $src_web ]; then
+		ERR  "目录有误"
+	    ERR_MSG "dest_data=$dest_data"	
+	    ERR_MSG "src_data=$src_data"	
+	    ERR_MSG "dest_web=$dest_web"	
+	    ERR_MSG "src_web=$src_web"	
+		exit 1
+	fi
+
+	read -e -p $(echo -e "从\e[92m$2\e[0m合并excel、web到\e[92m$1\e[0m?(y/n):") choice
+
+	if [ $choice == "y" ]; then
+		svn export --force --quiet $src_data $dest_data 	
+		INFO "=====导出DATA完成====="
+		svn st $dest_data
+		cd $dest_data
+		/home/jingle/.svn_commit_check.sh ci -m "版本同步"
+		
+		svn export --force --quiet $src_web $dest_web
+		INFO "=====导出WEB完成====="
+		svn st $dest_web
+		cd $dest_web
+		/home/jingle/.svn_commit_check.sh ci -m "版本同步"
+		
+	fi
 }
 
 DOC[j]="远程服务器"
@@ -377,55 +450,11 @@ fun_j(){
    esac
 }
 
-jump_step_1(){
-	ip=$1
-	expect -c "
-		set timeout 15
-    	spawn -noecho zssh -X -i ~/.ssh/id_rsa -p 2222 chenzengjin@134.175.229.26; 
-    	expect \"Opt\"; 
-    	send $ip;
-		sleep 0.5;
-		send \r;
-    	interact;
-	" 
-}
-
-jump_tw(){
-	expect -c "
-		set timeout 15
-    	spawn -noecho zssh -X -i ~/.ssh/id_rsa -p 1986 root@47.57.187.224; 
-		expect \"]#\";
-		send \"ssh 175.99.6.46 -p 1986\";
-		sleep 0.5;
-		send \r;
-    	interact;
-	" 
-}
-
-jump_step_2(){
-	ip=$1
-	choice=$2
-	expect -c "
-		set timeout 15
-    	spawn -noecho zssh -X -i ~/.ssh/id_rsa -p 2222 chenzengjin@134.175.229.26; 
-    	expect \"Opt\"; 
-    	send $ip;
-		sleep 0.5;
-		send \r;
-    	expect \"选择\"; 
-		sleep 0.5;
-    	send $choice;
-		sleep 0.5;
-		send \r;
-    	interact;
-	" 
-}
-
 jump_script(){
 	ip=$1
 	expect -c "
 	set timeout 10
-    spawn zssh -X -i ~/.ssh/id_rsa -p 2222 chenzengjin@134.175.229.26
+    spawn zssh JumpServer
 	expect \"Opt>\" {
 		send \"$ip\r\";
 		interact
@@ -505,7 +534,48 @@ fun_clean_share(){
 
 DOC[hot_sql]="拉取sql并执行更新"
 fun_hot_sql(){
-	/home/jingle/data/jhgame/hot_sql.sh		
+	# 设定为定时任务 每小时执行一次
+	repo_dir="${ROOT}/sqls"
+	sqls="${ROOT}/sqls/mailiang_dev/*.sql"
+	log_file="${ROOT}/hot_log.txt"
+	time_file="${ROOT}/hot_time.txt"
+
+	if [ -f $time_file ]; then
+		last_t=$(cat $time_file)
+	else
+		ERR "$time_file 不存在"
+		exit 1
+	fi	
+
+	if [ $(date +%u) -eq 1 ] && [ $(date +%H) -eq 10 ]; then
+	    # 每周清空
+	    INFO "$(date '+%y-%m-%d %T') : hot mailiang_dev" > $log_file
+	else
+	    INFO "$(date '+%y-%m-%d %T') : hot mailiang_dev" >> $log_file
+	fi
+	
+	svn up $repo_dir >> $log_file
+	
+	now_t=$(date +%s)
+	
+	for file in $sqls
+	do
+	    change_t=$(stat -c %Z $file)
+	    if [ $change_t -gt $last_t ] && [ $change_t -le $now_t ] && [ $(head -n 1 $file | awk '{print $2}') != "陈增锦" ]; then
+	          MSG "execute $(basename $file)" >> $log_file
+	          mysql -uroot -p123456 fanli_local < $file >> $log_file 2>&1
+	    fi
+	done
+	
+	# 更新时间
+	echo $now_t > $time_file
+	echo -e "done.\n" >> $log_file
+}
+
+DOC[test]="测试方法"
+fun_test(){
+    echo $ROOT
+
 }
 
 # -------------- 函数调用 --------------
