@@ -27,3 +27,17 @@ alias fd='
 # 远程连接win桌面
 alias rdp='rdesktop -g 1920x1080 -a 16 -u junhai 172.16.50.211'
 
+# git使用指定策略合并
+gct() {
+	git checkout --theirs $1 && git add $1 && git status;
+}
+
+# git使用指定策略合并
+gco() {
+	git checkout --ours $1 && git add $1 && git status;
+}
+
+# kill vscode 进程
+killcode() {
+	ps -ef | grep .vscode-server | awk '{print $2}' | xargs kill -9
+}

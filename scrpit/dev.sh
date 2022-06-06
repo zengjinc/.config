@@ -20,6 +20,7 @@ SCRIPT_PATH=$ROOT/script
 declare -A DOC 
 declare -A ARG
 TMUX_WIN_NO=1
+ERL=/usr/local/lib/erlang/bin/erl
 
 
 # 检测某个函数是否已经定义
@@ -270,7 +271,7 @@ fun_srv_restart(){
 	fun_srv_stop
 	sleep 2
     INFO "正在重新编译..."
-    cd ${ROOT}/server_git && make && fun_srv_start
+    cd ${ROOT}/server_git && fun_srv_make_debug && fun_srv_start
 }
 
 DOC[srv_hotfix]="热更游戏节点"
@@ -477,11 +478,18 @@ DOC[srv_hotfix_all]="编译热更所有"
 fun_srv_hotfix_all(){
     # 编译并计算时间
     start_time=$(date +%s)
-    cd ${ROOT}/server_git && make
+    fun_srv_make_debug
     time=$(expr `date +%s` - $start_time)
     min=$(expr $time / 60 + 1)
     # 热更
     fun_srv_hotfix $min
+}
+
+DOC[srv_make_debug]="编译所有代码"
+fun_srv_make_debug(){
+    cd ${ROOT}/server_git
+    params="{['gen_server_game.erl'],[]},{i,\"include\"},{outdir,\"ebin\"},inline,tuple_calls,{inline_size,30},debug_info"
+	make MAKE_OPTS=$params
 }
 
 DOC[srv_make_mod]="编译指定模块代码"
@@ -490,13 +498,10 @@ fun_srv_make_mod(){
     cd ${path} || exit 1
     INFO "正在编译服务器模块..."
     INFO "path:${path}"
+
     ebin=${ROOT}/server_git/ebin
-
-    #params="[{i,\"${ROOT}/server_git/include\"},{outdir,\"${ROOT}/server_git/ebin\"}]"
-    #erl -pa ${ebin} -noshell -eval "make:all(${params})" -s c q
-
     params="{['gen_server_game.erl'],[]},{i,\"${ROOT}/server_git/include\"},{outdir,\"${ROOT}/server_git/ebin\"},inline,tuple_calls,{inline_size,30},debug_info"
-    erl -pa ${ebin} -noshell -eval "mmake:all(6,[${params}])" -s c q
+    $ERL -pa ${ebin} -noshell -eval "mmake:all(6,[${params}])" -s c q
 
 	# todo 使用erlc并行编译
     #erlc -smp -v -I ${ROOT}/server_git/include -o ${ROOT}/server_git/ebin -pa ${ebin} *.erl
