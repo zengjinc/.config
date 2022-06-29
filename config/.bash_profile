@@ -30,6 +30,9 @@ POWERLINE_BASH_SELECT=1
 # fzf
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
+# z.sh
+#[ -f ~/z.sh ] && source ~/z.sh
+
 # rebar3
 [ -d ~/.cache/rebar3/bin ] && export PATH=$PATH:~/.cache/rebar3/bin 
 

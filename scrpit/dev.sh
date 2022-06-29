@@ -16,11 +16,17 @@ get_real_path(){
 
 # 定义
 ROOT=$(get_real_path)
+SRV_PATH=$ROOT/server_git
 SCRIPT_PATH=$ROOT/script
+DATA_PATH=$ROOT/data
+PROTO_PATH=$ROOT/proto
+WEB_PATH=$ROOT/web
+SQL_PATH=$ROOT/sqls
+EBIN_PATH=$ROOT/ebin
+ERL=/usr/local/lib/erlang/bin/erl
+T_NAME=dev
 declare -A DOC 
 declare -A ARG
-TMUX_WIN_NO=1
-ERL=/usr/local/lib/erlang/bin/erl
 
 
 # 检测某个函数是否已经定义
@@ -79,10 +85,10 @@ ERR_MSG(){
 lock_check(){
     local task=$1
     local msg=$2
-    lock=/tmp/unity_running_xc2_${task}.lock
+    lock=/tmp/running_xc2_${task}.lock
     if [ -f $lock ]; then
         taskname=$(<$lock)
-        ERR "Unity正在执行\"$taskname\"任务，需等待该任务完成..."
+        ERR "正在执行\"$taskname\"任务，需等待该任务完成..."
         exit 1
     fi
     touch $lock # 加锁
@@ -92,7 +98,7 @@ lock_check(){
 # 解锁
 lock_release(){
     local task=$1
-    lock=/tmp/unity_running_xc2_${task}.lock
+    lock=/tmp/running_xc2_${task}.lock
     rm -f $lock
 }
 
@@ -101,9 +107,13 @@ fun_completion(){
     echo $(declare -p DOC)
 }
 
-# 更新全局变量
-update_tmux_win_no(){
-	TMUX_WIN_NO=$[$(tmux list-window -t dev 2>&1 | wc -l) + 1]
+# 获取tmux新建窗口no
+get_tmux_win_no(){
+    expr $(tmux list-window -t ${T_NAME} 2>&1 | wc -l) + 1
+}
+
+current_branch(){
+	git branch 2>&1 | grep "*" | awk '{print $2}'	
 }
 
 DOC[up_all]="更新所有的源码仓库,所有分支"
@@ -127,7 +137,7 @@ fun_up_all(){
             fi
         elif [ -d $v/.svn ]; then
             echo ---------------------------------------------
-            INFO "更新仓库: \e[92m$(basename $v)\e[0;0m"
+            INFO "更新仓库: \e[92m$(basename $v)\e[0;0m 使用策略tf"
             # 使用默认策略 theirs-full 用版本库覆盖本地修改
             cd $v && svn update --accept tf
         fi
@@ -155,7 +165,7 @@ fun_up(){
             fi
         elif [ -d $v/.svn ]; then
             echo ---------------------------------------------
-            INFO "更新仓库: \e[92m$(basename $v)\e[0;0m"
+            INFO "更新仓库: \e[92m$(basename $v)\e[0;0m 使用策略tf"
             # 使用默认策略 theirs-full 用版本库覆盖本地修改
             cd $v && svn update --accept tf
         fi
@@ -208,11 +218,11 @@ fun_st(){
 DOC[gen_data]="调用生成数据脚本"
 ARG[gen_data]="[RepoVersion]"
 fun_gen_data(){
-    if [ -e "${ROOT}/data/${1}/run.sh" ]; then
-		path="${ROOT}/data/${1}"
+    if [ -e "${DATA_PATH}/${1}/run.sh" ]; then
+		path="${DATA_PATH}/${1}"
 	else
 		# 默认
-		path="${ROOT}/data/mailiang_dev"
+		path="${DATA_PATH}/mailiang_dev"
     fi
 	INFO "version:${path}"
     cd ${path} && ./run.sh $@ && rm -rf tabletool/Logs/LogExcelHead
@@ -221,11 +231,11 @@ fun_gen_data(){
 DOC[gen_proto]="调用生成协议脚本"
 ARG[gen_proto]="[RepoVersion]"
 fun_gen_proto(){
-	if [ -e "${ROOT}/proto/${1}/run.sh" ]; then
-		path="${ROOT}/proto/${1}"
+	if [ -e "${PROTO_PATH}/${1}/run.sh" ]; then
+		path="${PROTO_PATH}/${1}"
 	else
 		# 默认
-		path="${ROOT}/proto/mailiang"
+		path="${PROTO_PATH}/mailiang"
     fi
 	INFO "version:${path}"
     cd ${path} && ./run.sh $@
@@ -246,16 +256,16 @@ fun_srv_start(){
 
 DOC[srv_start2]="启动游戏服务"
 fun_srv_start2(){
-	if tmux has -t dev:game 2> /dev/null; then
+    W_NAME=game
+	if tmux has -t $T_NAME:$W_NAME 2> /dev/null; then
 		ERR "启动失败，窗口game已存在"
 		exit 1
 	fi
 	cd $SCRIPT_PATH
-    update_tmux_win_no	
-	tmux new-window -t dev:${TMUX_WIN_NO} -n game "./game.sh test"
-	tmux split-window -t dev:game "./game_cross_area.sh test"
-	tmux split-window -t dev:game "./game_cross_all.sh test"
-	tmux select-layout -t dev:game main-vertical 
+	tmux new-window -t $T_NAME:$(get_tmux_win_no) -n $W_NAME "./game.sh test"
+	tmux split-window -t $T_NAME:$W_NAME "./game_cross_area.sh test"
+	tmux split-window -t $T_NAME:$W_NAME "./game_cross_all.sh test"
+	tmux select-layout -t $T_NAME:$W_NAME main-vertical 
 }
 
 DOC[srv_stop]="停止游戏服务"
@@ -266,12 +276,12 @@ fun_srv_stop(){
     ./game.sh stop
 }
 
-#DOC[srv_restart]="编译后重启游戏服务"
+DOC[srv_restart]="编译后重启游戏服务"
 fun_srv_restart(){
 	fun_srv_stop
 	sleep 2
     INFO "正在重新编译..."
-    cd ${ROOT}/server_git && fun_srv_make_debug && fun_srv_start
+    cd ${SRV_PATH} && fun_make && fun_srv_start
 }
 
 DOC[srv_hotfix]="热更游戏节点"
@@ -281,8 +291,9 @@ fun_srv_hotfix(){
 		cd $SCRIPT_PATH
     	INFO "正在热更服务器"
         ./game.sh hotfix $1
-        ./game_cross_all.sh hotfix $1
-        ./game_cross_area.sh hotfix $1
+        ./game.sh reboot_wn "hotfix_finish" > /dev/null
+        ./game_cross_all.sh hotfix $1 
+        ./game_cross_area.sh hotfix $1 
     fi
 }
 
@@ -314,7 +325,7 @@ fun_create_branch(){
    fi
 }
 
-DOC[merge_branch]="分支分支代码"
+DOC[merge_branch]="合并分支代码"
 ARG[merge_branch]="Destination Sorce eg:fanti fanti_dev"
 fun_merge_branch(){
     dest=$1
@@ -334,17 +345,17 @@ fun_merge_branch(){
 
 	if [ $choice == "y" ]; then
 
-	 git checkout $src && git up \
-	 && git checkout $dest && git up \
-	 && git checkout --theirs --progress $src -- src/ \
-	 && git checkout --theirs --progress $src -- include/ \
+        git checkout $src && git up \
+        && git checkout $dest && git up \
+        && git checkout --theirs --progress $src -- src/ \
+        && git checkout --theirs --progress $src -- include/ \
 
-	 if [ $? -eq 0 ]; then
-     	INFO "合并完成"
-	 else
-	 	ERR "合并过程出错..."
-	 	exit 1
-	 fi
+        if [ $? -eq 0 ]; then
+            INFO "合并完成"
+        else
+            ERR "合并过程出错..."
+            exit 1
+        fi
 
 	 fi
 }
@@ -352,11 +363,11 @@ fun_merge_branch(){
 DOC[export_svn]="版本合并同步"
 ARG[export_svn]="Destination Sorce eg:fanti fanti_dev"
 fun_export_svn(){
-    dest_data=$ROOT/data/$1/excel/
-    src_data=$ROOT/data/$2/excel/
+    dest_data=$DATA_PATH/$1/excel/
+    src_data=$DATA_PATH/$2/excel/
 
-	dest_web=$ROOT/web/$1/app/modules/
-	src_web=$ROOT/web/$2/app/modules/
+	dest_web=$WEB_PATH/$1/app/modules/
+	src_web=$WEB_PATH/$2/app/modules/
 	
 	if [ ! $1 ] || [ ! $2 ]; then
 		ERR "传入参数有误"
@@ -372,15 +383,20 @@ fun_export_svn(){
 		exit 1
 	fi
 
-	read -e -p $(echo -e "从\e[92m$2\e[0m合并excel、web到\e[92m$1\e[0m?(y/n):") choice
+	read -e -p $(echo -e "从\e[92m$2\e[0m合并excel到\e[92m$1\e[0m?(y/n):") choice_excel
 
-	if [ $choice == "y" ]; then
+	if [ $choice_excel == "y" ]; then
 		svn export --force --quiet $src_data $dest_data 	
 		INFO "=====导出DATA完成====="
 		svn st $dest_data
 		cd $dest_data
 		/home/jingle/.svn_commit_check.sh ci -m "版本同步"
 		
+	fi
+
+	read -e -p $(echo -e "从\e[92m$2\e[0m合并web到\e[92m$1\e[0m?(y/n):") choice_web
+
+	if [ $choice_web == "y" ]; then
 		svn export --force --quiet $src_web $dest_web
 		INFO "=====导出WEB完成====="
 		svn st $dest_web
@@ -408,42 +424,35 @@ fun_j(){
    fi
    case $no in
      1 | jump) 
-		update_tmux_win_no
-		tmux new-window -t dev:${TMUX_WIN_NO} -n Jump-Server "zssh JumpServer"
+		tmux new-window -t $T_NAME:$(get_tmux_win_no) -n Jump-Server "zssh JumpServer"
 	    ;;
-     2) 
-		update_tmux_win_no
-		tmux new-window -t dev:${TMUX_WIN_NO} -n Zll3d-Develop "zssh DevelopMachine"
+     2 | dev) 
+		tmux new-window -t $T_NAME:$(get_tmux_win_no) -n Zll3d-Develop "zssh DevelopMachine"
 	    ;;
-	 3) 
-		update_tmux_win_no
-		tmux new-window -t dev:${TMUX_WIN_NO} -n Zll3d-Script "zssh ScriptMachine"
+	 3 | scr) 
+		tmux new-window -t $T_NAME:$(get_tmux_win_no) -n Zll3d-Script "zssh ScriptMachine"
 	    ;;
-	 4) 
-		update_tmux_win_no
-		tmux new-window -t dev:${TMUX_WIN_NO} -n Zll3d-Center "zssh CenterMachine"
+	 4 | center) 
+		tmux new-window -t $T_NAME:$(get_tmux_win_no) -n Zll3d-Center "zssh CenterMachine"
 	    ;;
-	 5) 
-		update_tmux_win_no
-		tmux new-window -t dev:${TMUX_WIN_NO} -n Zll3d-Center-Ft "zssh CenterFtMachine"
+	 5 | center-ft) 
+		tmux new-window -t $T_NAME:$(get_tmux_win_no) -n Zll3d-Center-Ft "zssh CenterFtMachine"
 	    ;;
 	 6) 
-		update_tmux_win_no
-		tmux new-window -t dev:${TMUX_WIN_NO} -n Zll3d-Release "zssh ScriptMachine"
-		tmux split-window -t dev:Zll3d-Release "zssh CenterMachine"
-		tmux select-layout -t dev:Zll3d-Release even-horizontal
+		tmux new-window -t $T_NAME:$(get_tmux_win_no) -n Zll3d-Release "zssh ScriptMachine"
+		tmux split-window -t $T_NAME:Zll3d-Release "zssh CenterMachine"
+		tmux select-layout -t $T_NAME:Zll3d-Release even-horizontal
 		sleep 1
-		tmux send-keys -t dev:Zll3d-Release.1 "cd /data/ctl/zll3d" C-m
-		tmux send-keys -t dev:Zll3d-Release.2 "cd /data/ctl/" C-m
+		tmux send-keys -t $T_NAME:Zll3d-Release.1 "cd /data/ctl/zll3d" C-m
+		tmux send-keys -t $T_NAME:Zll3d-Release.2 "cd /data/ctl/" C-m
 	    ;;
 	 7) 
-		update_tmux_win_no
-		tmux new-window -t dev:${TMUX_WIN_NO} -n Zll3d-Ft-Release "zssh ScriptMachine"
-		tmux split-window -t dev:Zll3d-Ft-Release "zssh CenterFtMachine"
-		tmux select-layout -t dev:Zll3d-Ft-Release even-horizontal
+		tmux new-window -t $T_NAME:$(get_tmux_win_no) -n Zll3d-Ft-Release "zssh ScriptMachine"
+		tmux split-window -t $T_NAME:Zll3d-Ft-Release "zssh CenterFtMachine"
+		tmux select-layout -t $T_NAME:Zll3d-Ft-Release even-horizontal
 		sleep 1
-		tmux send-keys -t dev:Zll3d-Ft-Release.1 "cd /data/ctl/zll3dtw" C-m
-		tmux send-keys -t dev:Zll3d-Ft-Release.2 "cd /data/ctl/" C-m
+		tmux send-keys -t $T_NAME:Zll3d-Ft-Release.1 "cd /data/ctl/zll3dtw" C-m
+		tmux send-keys -t $T_NAME:Zll3d-Ft-Release.2 "cd /data/ctl/" C-m
 	    ;;
      11) zssh -X -i ~/.ssh/id_rsa root@120.24.193.173 ;;
      12) zssh -X -i ~/.ssh/id_rsa -p 27942 root@97.64.29.225 ;;
@@ -467,7 +476,8 @@ DOC[srv_hotfix_mod]="编译热更模块代码"
 fun_srv_hotfix_mod(){
     # 编译并计算时间
     start_time=$(date +%s)
-    fun_srv_make_mod
+    cd $SCRIPT_PATH && ./game.sh reboot_wn "recompile_some_code..." > /dev/null
+    fun_srv_make_mod $1
     time=$(expr `date +%s` - $start_time)
     min=$(expr $time / 60 + 1)
     # 热更
@@ -478,33 +488,53 @@ DOC[srv_hotfix_all]="编译热更所有"
 fun_srv_hotfix_all(){
     # 编译并计算时间
     start_time=$(date +%s)
-    fun_srv_make_debug
+    cd $SCRIPT_PATH && ./game.sh reboot_wn "recompile_all_code..." > /dev/null
+    fun_make
     time=$(expr `date +%s` - $start_time)
     min=$(expr $time / 60 + 1)
     # 热更
     fun_srv_hotfix $min
 }
 
-DOC[srv_make_debug]="编译所有代码"
-fun_srv_make_debug(){
-    cd ${ROOT}/server_git
-    params="{['gen_server_game.erl'],[]},{i,\"include\"},{outdir,\"ebin\"},inline,tuple_calls,{inline_size,30},debug_info"
-	make MAKE_OPTS=$params
+DOC[make]="编译所有代码"
+fun_make(){
+    cd ${SRV_PATH}
+
+	process_num=12
+    # 需要debug信息时增加
+    params="debug_info"
+    # params=""
+
+	make ERL=$ERL PROCESS_NUM=$process_num MAKE_OPTS=$params
+
+    rsync_path=${EBIN_PATH}/$(current_branch)/
+    mkdir -p ${rsync_path}
+	rsync -rt --delete ebin/ ${rsync_path}
 }
 
 DOC[srv_make_mod]="编译指定模块代码"
 fun_srv_make_mod(){
-	path="$( find $ROOT/server_git/src -maxdepth 3 -type d | fzf --height 40% )"
+    if [ $1 ]; then
+        path=$1
+    else
+	    path="$( find $SRV_PATH/src -maxdepth 3 -type d | fzf --height 40% )"
+    fi
     cd ${path} || exit 1
     INFO "正在编译服务器模块..."
     INFO "path:${path}"
 
-    ebin=${ROOT}/server_git/ebin
-    params="{['gen_server_game.erl'],[]},{i,\"${ROOT}/server_git/include\"},{outdir,\"${ROOT}/server_git/ebin\"},inline,tuple_calls,{inline_size,30},debug_info"
-    $ERL -pa ${ebin} -noshell -eval "mmake:all(6,[${params}])" -s c q
+    ebin=${SRV_PATH}/ebin
+	include=${SRV_PATH}/include
+	outdir=${SRV_PATH}/ebin
+    # 需要debug信息时增加
+    params="{['gen_server_game.erl'],[]},{i,\"${include}\"},{outdir,\"${outdir}\"},inline,tuple_calls,{inline_size,30},debug_info"
+    # params="{['gen_server_game.erl'],[]},{i,\"${include}\"},{outdir,\"${outdir}\"},inline,tuple_calls,{inline_size,30}"
 
-	# todo 使用erlc并行编译
-    #erlc -smp -v -I ${ROOT}/server_git/include -o ${ROOT}/server_git/ebin -pa ${ebin} *.erl
+    $ERL -pa ${ebin} -noshell -eval "mmake:all(12,[${params}])" -s c q
+
+    rsync_path=${EBIN_PATH}/$(current_branch)/
+    mkdir -p ${rsync_path}
+	rsync -rtv --delete $ebin/ ${rsync_path}
 
     INFO "编译源码完成"   
 }
@@ -512,7 +542,7 @@ fun_srv_make_mod(){
 DOC[fd]="查找配置表"
 ARG[fd]="[RepoVersion]"
 fun_fd(){
-	path="/home/jingle/data/jhgame/data/${1}/excel"
+	path="${DATA_PATH}/${1}/excel"
     if [ -d $path ]; then
    		find $path -name "*.xlsx" \
 		| fzf --bind "enter:execute-silent(et {} &)+abort,left-click:execute-silent(et {} &)+abort" 
@@ -523,7 +553,11 @@ fun_fd(){
 
 DOC[erl_ls]="连接到erlang_ls"
 fun_erl_ls(){
-    name=$(epmd -names | grep erlang_ls | awk '{print $2}')
+	if [ $1 ]; then
+		name=$1	
+	else
+    	name=$(epmd -names | grep erlang_ls | awk '{print $2}' | head -n 1)
+	fi
     if [ $name ]; then
         erl -sname debug -remsh $name@jingle-PC	
     else
@@ -536,39 +570,51 @@ fun_clean_share(){
 	cd ~/share/ && find ./* |  grep -v "note" | xargs rm -rf
 }
 
-
-DOC[hot_sql]="拉取sql并执行更新"
-fun_hot_sql(){
+DOC[hotsql]="拉取sql并执行更新"
+fun_hotsql(){
 	# 设定为定时任务 每小时执行一次
-	repo_dir="${ROOT}/sqls"
-	sqls="${ROOT}/sqls/mailiang_dev/*.sql"
+	mailiang_sqls="${SQL_PATH}/mailiang_dev/*.sql"
+	fanti_sqls="${SQL_PATH}/fanti_dev/*.sql"
 	log_file="${ROOT}/hot_log.txt"
 	time_file="${ROOT}/hot_time.txt"
 
 	if [ -f $time_file ]; then
 		last_t=$(cat $time_file)
 	else
-		ERR "$time_file 不存在"
-		exit 1
+		last_t=0
 	fi	
-
+	
+	# 更新
 	if [ $(date +%u) -eq 1 ] && [ $(date +%H) -eq 10 ]; then
 	    # 每周清空
-	    INFO "$(date '+%y-%m-%d %T') : hot mailiang_dev" > $log_file
+		echo "==== hot sqls : $(date '+%y-%m-%d %T') ====" > $log_file
+		svn up $SQL_PATH >> $log_file
 	else
-	    INFO "$(date '+%y-%m-%d %T') : hot mailiang_dev" >> $log_file
+		echo "==== hot sqls : $(date '+%y-%m-%d %T') ====" >> $log_file
+		svn up $SQL_PATH >> $log_file
 	fi
-	
-	svn up $repo_dir >> $log_file
-	
+
 	now_t=$(date +%s)
 	
-	for file in $sqls
+	# mailiang
+	INFO "hot mailiang_dev" >> $log_file
+	for file in $mailiang_sqls
 	do
 	    change_t=$(stat -c %Z $file)
 	    if [ $change_t -gt $last_t ] && [ $change_t -le $now_t ] && [ $(head -n 1 $file | awk '{print $2}') != "陈增锦" ]; then
 	          MSG "execute $(basename $file)" >> $log_file
-	          mysql -uroot -p123456 fanli_local < $file >> $log_file 2>&1
+	          mysql -uroot -p123456 fanli_local -f < $file >> $log_file 2>&1
+	    fi
+	done
+
+	# fanti
+	INFO "hot fanti_dev" >> $log_file
+	for file in $fanti_sqls
+	do
+	    change_t=$(stat -c %Z $file)
+	    if [ $change_t -gt $last_t ] && [ $change_t -le $now_t ] && [ $(head -n 1 $file | awk '{print $2}') != "陈增锦" ]; then
+	          MSG "execute $(basename $file)" >> $log_file
+	          mysql -uroot -p123456 fanti_local -f < $file >> $log_file 2>&1
 	    fi
 	done
 	
@@ -580,7 +626,8 @@ fun_hot_sql(){
 DOC[test]="测试方法"
 fun_test(){
     echo $ROOT
-
+	echo $(get_tmux_win_no)
+    
 }
 
 # -------------- 函数调用 --------------

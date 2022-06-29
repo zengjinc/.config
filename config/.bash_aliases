@@ -20,6 +20,14 @@ if [ -f ~/.git_commit_check.sh ]; then
     alias git="~/.git_commit_check.sh $@"
 fi
 
+if [ -f ~/.make_check.sh ]; then
+    alias make="~/.make_check.sh $@"
+fi
+
+if type bat > /dev/null 2>&1; then
+    alias cat=bat
+fi
+
 alias fd='
 	find ~/data/jhgame/data/mailiang_dev/excel/ -name "*.xlsx" \
 	| fzf --bind "enter:execute-silent(et {} &)+abort,left-click:execute-silent(et {} &)+abort"
@@ -39,5 +47,5 @@ gco() {
 
 # kill vscode 进程
 killcode() {
-	ps -ef | grep .vscode-server | awk '{print $2}' | xargs kill -9
+	ps -ef | grep .vscode-server | grep -v pts | awk '{print $2}' | xargs kill -9
 }

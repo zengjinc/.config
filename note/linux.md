@@ -1,5 +1,6 @@
 ### 开机启动脚本
-在路径 ==~/.config/autostart== 中新建 .desktop 文件
+* 在路径 ==~/.config/autostart== 中新建 .desktop 文件
+* 添加到  /etc/rc.local 脚本中
 
 ### 更改分辨率1
 ```bash
