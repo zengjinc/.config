@@ -23,6 +23,7 @@ cp -r ~/.config/alacritty/* alacritty/ \
 && cp ~/.vcs_auto.sh scrpit/ \
 && cp ~/bdown.sh scrpit/ \
 && cp /usr/local/frp/frp_0.43.0_linux_amd64/*.ini config/frp \
+&& cp /usr/local/frp/frp_0.43.0_linux_amd64/run.sh config/frp \
 \
 && git add . \
 && git commit -m sync \
