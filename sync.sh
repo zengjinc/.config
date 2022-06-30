@@ -6,6 +6,8 @@ cp -r ~/.config/alacritty/* alacritty/ \
 && cp ~/.gitignore_global config/ \
 && cp ~/.svnignore_global config/ \
 && cp ~/.tmux.conf config/ \
+&& cp /usr/local/frp/frp_0.43.0_linux_amd64/*.ini config/frp \
+&& cp /usr/local/frp/frp_0.43.0_linux_amd64/run.sh config/frp \
 \
 && cp ~/data/jhgame/server_git/elvis.config erl_config/ \
 && cp ~/data/jhgame/server_git/erlang_ls.config erl_config/ \
@@ -22,8 +24,6 @@ cp -r ~/.config/alacritty/* alacritty/ \
 && cp ~/.svn_commit_check.sh scrpit/ \
 && cp ~/.vcs_auto.sh scrpit/ \
 && cp ~/bdown.sh scrpit/ \
-&& cp /usr/local/frp/frp_0.43.0_linux_amd64/*.ini config/frp \
-&& cp /usr/local/frp/frp_0.43.0_linux_amd64/run.sh config/frp \
 \
 && git add . \
 && git commit -m sync \
