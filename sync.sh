@@ -6,6 +6,8 @@ cp -r ~/.config/alacritty/* alacritty/ \
 && cp ~/.gitignore_global config/ \
 && cp ~/.svnignore_global config/ \
 && cp ~/.tmux.conf config/ \
+&& cp ~/.make_check.sh config/ \
+&& cp ~/.vimrc config/ \
 && cp /usr/local/frp/frp_0.43.0_linux_amd64/*.ini config/frp \
 && cp /usr/local/frp/frp_0.43.0_linux_amd64/run.sh config/frp \
 \
