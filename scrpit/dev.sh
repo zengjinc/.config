@@ -623,6 +623,22 @@ fun_hotsql(){
 	echo -e "done.\n" >> $log_file
 }
 
+DOC[proxy]="开启代理"
+fun_proxy(){
+   echo "open proxy"
+   export all_proxy="socks5://172.16.50.211:10810" 
+   export https_proxy="172.16.50.211:10811" 
+   export http_proxy="172.16.50.211:10811" 
+}
+
+DOC[unproxy]="关闭代理"
+fun_unproxy(){
+  echo "close proxy"
+  unset all_proxy 
+  unset https_proxy 
+  unset http_proxy 
+}
+
 DOC[test]="测试方法"
 fun_test(){
     echo $ROOT
