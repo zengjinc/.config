@@ -15,7 +15,11 @@ get_real_path(){
 }
 
 # 定义
+declare -A DOC 
+declare -A ARG
+
 ROOT=$(get_real_path)
+
 SRV_PATH=$ROOT/server_git
 SCRIPT_PATH=$ROOT/script
 DATA_PATH=$ROOT/data
@@ -23,10 +27,17 @@ PROTO_PATH=$ROOT/proto
 WEB_PATH=$ROOT/web
 SQL_PATH=$ROOT/sqls
 EBIN_PATH=$ROOT/ebin
+
+# erl 21 版本
 ERL=/usr/local/lib/erlang/bin/erl
+
+# tmux session name
 T_NAME=dev
-declare -A DOC 
-declare -A ARG
+
+# 主开发版本
+DEV_VER=fanli_dev
+DEV_PROTO_VER=fanli
+
 
 
 # 检测某个函数是否已经定义
@@ -222,10 +233,10 @@ fun_gen_data(){
 		path="${DATA_PATH}/${1}"
 	else
 		# 默认
-		path="${DATA_PATH}/mailiang_dev"
+		path="${DATA_PATH}/${DEV_VER}"
     fi
 	INFO "version:${path}"
-    cd ${path} && ./run.sh $@ && rm -rf tabletool/Logs/LogExcelHead
+    cd ${path} && ./run.sh $@ #&& rm -rf tabletool/Logs/LogExcelHead
 }
 
 DOC[gen_proto]="调用生成协议脚本"
@@ -235,7 +246,7 @@ fun_gen_proto(){
 		path="${PROTO_PATH}/${1}"
 	else
 		# 默认
-		path="${PROTO_PATH}/mailiang"
+		path="${PROTO_PATH}/${DEV_PROTO_VER}"
     fi
 	INFO "version:${path}"
     cd ${path} && ./run.sh $@
@@ -361,8 +372,9 @@ fun_merge_branch(){
 }
 
 DOC[export_svn]="版本合并同步"
-ARG[export_svn]="Destination Sorce eg:fanti fanti_dev"
+ARG[export_svn]="Destination Sorce eg:fanti_dev fanli_dev"
 fun_export_svn(){
+
     dest_data=$DATA_PATH/$1/excel/
     src_data=$DATA_PATH/$2/excel/
 
@@ -405,6 +417,39 @@ fun_export_svn(){
 		
 	fi
 }
+
+DOC[export_proto]="协议合并同步"
+ARG[export_proto]="Destination Sorce eg:fanti fanli"
+fun_export_proto(){
+
+	dest_proto=$PROTO_PATH/$1/proto/
+    src_proto=$PROTO_PATH/$2/proto/
+	
+	if [ ! $1 ] || [ ! $2 ]; then
+		ERR "传入参数有误"
+		exit 1
+	fi
+
+	if [ ! -d $dest_proto ] || [ ! -d $src_proto ]; then
+		ERR  "目录有误"
+	    ERR_MSG "dest_proto=$dest_proto"	
+	    ERR_MSG "src_proto=$src_proto"	
+		exit 1
+	fi
+
+	read -e -p $(echo -e "从\e[92m$2\e[0m合并proto到\e[92m$1\e[0m?(y/n):") choice_proto
+
+	if [ $choice_proto == "y" ]; then
+		svn export --force --quiet $src_proto $dest_proto 	
+		INFO "=====导出PROTO完成====="
+		svn st $dest_proto
+		cd $dest_proto
+		/home/jingle/.svn_commit_check.sh ci -m "版本同步"
+		
+	fi
+
+}
+
 
 DOC[j]="远程服务器"
 ARG[j]="[Which]"
@@ -573,7 +618,7 @@ fun_clean_share(){
 DOC[hotsql]="拉取sql并执行更新"
 fun_hotsql(){
 	# 设定为定时任务 每小时执行一次
-	mailiang_sqls="${SQL_PATH}/mailiang_dev/*.sql"
+	dev_sqls="${SQL_PATH}/${DEV_VER}/*.sql"
 	fanti_sqls="${SQL_PATH}/fanti_dev/*.sql"
 	log_file="${ROOT}/hot_log.txt"
 	time_file="${ROOT}/hot_time.txt"
@@ -596,9 +641,9 @@ fun_hotsql(){
 
 	now_t=$(date +%s)
 	
-	# mailiang
-	INFO "hot mailiang_dev" >> $log_file
-	for file in $mailiang_sqls
+	# dev
+	INFO "hot ${DEV_VER}" >> $log_file
+	for file in $dev_sqls
 	do
 	    change_t=$(stat -c %Z $file)
 	    if [ $change_t -gt $last_t ] && [ $change_t -le $now_t ] && [ $(head -n 1 $file | awk '{print $2}') != "陈增锦" ]; then
@@ -621,22 +666,6 @@ fun_hotsql(){
 	# 更新时间
 	echo $now_t > $time_file
 	echo -e "done.\n" >> $log_file
-}
-
-DOC[proxy]="开启代理"
-fun_proxy(){
-   echo "open proxy"
-   export all_proxy="socks5://172.16.50.211:10810" 
-   export https_proxy="172.16.50.211:10811" 
-   export http_proxy="172.16.50.211:10811" 
-}
-
-DOC[unproxy]="关闭代理"
-fun_unproxy(){
-  echo "close proxy"
-  unset all_proxy 
-  unset https_proxy 
-  unset http_proxy 
 }
 
 DOC[test]="测试方法"
