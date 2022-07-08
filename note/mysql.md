@@ -2,6 +2,7 @@
 
 ### 执行 sql 脚本
 ```bash
+# -f 跳过报错强制
 mysql -ugame -p$(cat /data/mysql) -f fanti_dev < hot.sql
 ```
 

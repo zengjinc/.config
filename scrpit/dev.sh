@@ -372,7 +372,7 @@ fun_merge_branch(){
 }
 
 DOC[export_svn]="版本合并同步"
-ARG[export_svn]="Destination Sorce eg:fanti_dev fanli_dev"
+ARG[export_svn]="Destination Sorce eg:fanti_dev mailiang_dev"
 fun_export_svn(){
 
     dest_data=$DATA_PATH/$1/excel/
@@ -421,7 +421,7 @@ fun_export_svn(){
 }
 
 DOC[export_proto]="协议合并同步"
-ARG[export_proto]="Destination Sorce eg:fanti fanli"
+ARG[export_proto]="Destination Sorce eg:fanti mailiang"
 fun_export_proto(){
 
 	dest_proto=$PROTO_PATH/$1/proto/
