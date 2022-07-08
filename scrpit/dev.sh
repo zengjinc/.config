@@ -402,6 +402,7 @@ fun_export_svn(){
 		INFO "=====导出DATA完成====="
 		svn st $dest_data
 		cd $dest_data
+		svn add --force .
 		/home/jingle/.svn_commit_check.sh ci -m "版本同步"
 		
 	fi
@@ -413,6 +414,7 @@ fun_export_svn(){
 		INFO "=====导出WEB完成====="
 		svn st $dest_web
 		cd $dest_web
+		svn add --force .
 		/home/jingle/.svn_commit_check.sh ci -m "版本同步"
 		
 	fi
@@ -444,6 +446,7 @@ fun_export_proto(){
 		INFO "=====导出PROTO完成====="
 		svn st $dest_proto
 		cd $dest_proto
+		svn add --force .
 		/home/jingle/.svn_commit_check.sh ci -m "版本同步"
 		
 	fi
